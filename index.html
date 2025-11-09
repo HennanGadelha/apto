@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Lista de Apartamentos</title>
+  <style>
+    :root{
+      --bg:#f6f8fa; --card:#fff; --text:#1f2a37; --muted:#6b7280;
+      --brand:#2563eb; --brand-weak:#e6efff; --success:#16a085;
+      --ring: rgba(37, 99, 235, .35);
+      --shadow: 0 6px 18px rgba(0,0,0,.08);
+      --shadow-lg: 0 10px 24px rgba(0,0,0,.12);
+      --radius: 14px;
+    }
+    *{ box-sizing: border-box; }
+    html, body { height: 100%; }
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Poppins", sans-serif;
+      padding: clamp(16px, 2.5vw, 32px);
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+    }
+    .container{ width:100%; max-width:980px; margin:0 auto; }
+    h1{ margin:0 0 12px; text-align:center; font-size: clamp(1.2rem, 1rem + 1vw, 1.9rem); }
+
+    /* Toolbar mobile-first (sem sticky/overflow no iOS para evitar bugs) */
+    .toolbar{ display:flex; gap:10px; align-items:center; justify-content:center; margin: 8px 0 12px; }
+
+    /* Segmented feito com radio + label */
+    fieldset.segmented{
+      margin:0; padding:6px; border:1px solid #e8ecf3; border-radius:999px;
+      background:var(--card); box-shadow:var(--shadow); display:inline-flex; gap:6px;
+    }
+    .segmented legend{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+    .segmented input[type="radio"]{
+      position:absolute; opacity:0; pointer-events:none; /* continua acessível ao label */
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:10px 14px; border-radius:999px; cursor:pointer; user-select:none;
+      font-weight:600; color:var(--muted); border:1px solid transparent;
+      transition: background .2s, color .2s, transform .02s ease-in, border-color .2s;
+      -webkit-tap-highlight-color: transparent;
+      white-space:nowrap; font-size:clamp(.95rem, .85rem + .3vw, 1rem);
+    }
+    .pill:hover{ background:#f7f9fc; color:var(--text); }
+    .pill:active{ transform: translateY(1px); }
+    /* estado ativo via :checked */
+    #sort-asc:checked + label[for="sort-asc"],
+    #sort-desc:checked + label[for="sort-desc"]{
+      background: var(--brand-weak); color: var(--brand);
+      border-color: rgba(37,99,235,.18);
+    }
+    .hint{ font-size:.9rem; color:var(--muted); }
+
+    .lista-apartamentos{
+      display:grid; grid-template-columns:1fr; gap:14px; margin-top:6px;
+    }
+    @media (min-width:560px){ .lista-apartamentos{ grid-template-columns:repeat(2,1fr); gap:16px; } }
+    @media (min-width:900px){ .lista-apartamentos{ grid-template-columns:repeat(3,1fr); gap:18px; } }
+
+    .apartamento{
+      background:var(--card); border-radius:var(--radius);
+      padding: clamp(14px, 2.2vw, 18px);
+      box-shadow: var(--shadow); border:1px solid #eef2f7;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .apartamento:hover{ transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .apartamento h2{ margin:0 0 6px; font-size:clamp(1.02rem,.95rem + .5vw,1.15rem); }
+    .info{ margin:6px 0; color:#364152; font-size:.97rem; }
+    .valor{ font-weight:700; color:var(--success); margin-top:6px; }
+
+    .link{
+      display:inline-block; margin-top:10px; text-decoration:none; font-weight:600;
+      background:var(--brand); color:#fff; padding:10px 14px; border-radius:10px;
+      transition: transform .15s ease, box-shadow .15s ease, background .2s;
+      box-shadow: 0 6px 16px rgba(37,99,235,.22);
+      will-change: transform; -webkit-tap-highlight-color: transparent;
+    }
+    .link:hover{ background:#1d4ed8; transform: translateY(-1px); }
+    .link:active{ transform: translateY(0); }
+
+    .i{ width:16px; height:16px; display:inline-block; }
+    .i-arrow-up::before{ content:"↑"; }
+    .i-arrow-down::before{ content:"↓"; }
+    .i-money::before{ content:"R$"; font-size:.85em; font-weight:700; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Lista de Apartamentos</h1>
+
+    <div class="toolbar">
+      <fieldset class="segmented" id="sort-group">
+        <legend>Ordenar por preço</legend>
+
+        <input type="radio" name="sort" id="sort-asc" value="asc" checked />
+        <label class="pill" for="sort-asc">
+          <span class="i i-money" aria-hidden="true"></span>
+          Preço <span class="i i-arrow-up" aria-hidden="true"></span>
+        </label>
+
+        <input type="radio" name="sort" id="sort-desc" value="desc" />
+        <label class="pill" for="sort-desc">
+          <span class="i i-money" aria-hidden="true"></span>
+          Preço <span class="i i-arrow-down" aria-hidden="true"></span>
+        </label>
+      </fieldset>
+      <div class="hint">Toque para ordenar</div>
+    </div>
+
+    <div class="lista-apartamentos" id="lista">
+      <div class="apartamento" data-valor="180000">
+        <h2>Apartamento - Tamarineira</h2>
+        <p class="info"><strong>Quartos:</strong> 3</p>
+        <p class="info valor"><strong>Valor:</strong> R$ 180.000</p>
+        <a class="link" href="https://www.zapimoveis.com.br/imovel/venda-apartamento-3-quartos-tamarineira-recife-pe-87m2-id-2832264870/" target="_blank" rel="noopener">Ver no Zap Imóveis</a>
+      </div>
+      <div class="apartamento" data-valor="160000">
+        <h2>Apartamento - Boa Vista</h2>
+        <p class="info"><strong>Quartos:</strong> 3</p>
+        <p class="info valor"><strong>Valor:</strong> R$ 160.000</p>
+        <a class="link" href="https://www.zapimoveis.com.br/imovel/venda-apartamento-3-quartos-boa-vista-recife-pe-67m2-id-2832318943/" target="_blank" rel="noopener">Ver no Zap Imóveis</a>
+      </div>
+      <div class="apartamento" data-valor="140000">
+        <h2>Apartamento - Imbiribeira</h2>
+        <p class="info"><strong>Quartos:</strong> 2</p>
+        <p class="info valor"><strong>Valor:</strong> R$ 140.000</p>
+        <a class="link" href="https://www.zapimoveis.com.br/imovel/venda-apartamento-2-quartos-imbiribeira-recife-pe-59m2-id-2848973544/" target="_blank" rel="noopener">Ver no Zap Imóveis</a>
+      </div>
+    </div>
+  </div>
+<script>
+  const lista = document.getElementById('lista');
+  const group = document.getElementById('sort-group');
+
+  function ordenar(ordem) {
+    // pega só os cards (div.apartamento), ignora qualquer nó estranho
+    const cards = Array.from(lista.querySelectorAll('.apartamento'));
+
+    cards.sort((a, b) => {
+      const va = parseInt(a.getAttribute('data-valor'), 10);
+      const vb = parseInt(b.getAttribute('data-valor'), 10);
+      return va - vb;
+    });
+
+    if (ordem === 'desc') cards.reverse();
+
+    // reanexa na nova ordem
+    cards.forEach(card => lista.appendChild(card));
+  }
+
+  // iOS/Android/PC: ler sempre o radio checado garante o valor correto
+  group.addEventListener('change', () => {
+    const checked = group.querySelector('input[name="sort"]:checked');
+    const ordem = checked ? checked.value : 'asc';
+    ordenar(ordem);
+  });
+
+  // ordenação inicial
+  ordenar('asc');
+</script>
+
+</body>
+</html>
